@@ -4,7 +4,6 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import com.newlevel.new_level_spring.exception.ResponsiveStatusExeption;
-import com.newlevel.new_level_spring.model.DTOS.UserRequestDTO;
 import com.newlevel.new_level_spring.model.DTOS.UserResponseDTO;
 import com.newlevel.new_level_spring.model.User;
 import com.newlevel.new_level_spring.repository.UserRepository;
@@ -28,25 +27,26 @@ public class UserService {
     return toResponseDTO(user);
   }
 
-  public UserResponseDTO createUser(UserRequestDTO userDTO, Jwt jwt) {
+  public UserResponseDTO createUser(Jwt jwt) {
 
-    String auth0Id = jwt.getSubject();
+      String auth0Id = jwt.getSubject();
+      String name = jwt.getClaimAsString("name");
 
-    if (existUserById(auth0Id)) {
-      throw new ResponsiveStatusExeption("Usuário já existe");
-    }
+      if (existUserById(auth0Id)) {
+          throw new ResponsiveStatusExeption("Usuário já existe");
+      }
 
-    User newUser = User.builder()
-      .auth0Id(auth0Id)
-      .name(userDTO.getName())
-      .build();
+      User newUser = User.builder()
+          .auth0Id(auth0Id)
+          .name(name)
+          .build();
 
-    User savedUser = userRepository.save(newUser);
+      User savedUser = userRepository.save(newUser);
 
-    return toResponseDTO(savedUser);
+      return toResponseDTO(savedUser);
   }
 
-  public UserResponseDTO updateUser(UserRequestDTO userDTO, Jwt jwt) {
+  public UserResponseDTO updateUser( Jwt jwt) {
 
     String auth0Id = jwt.getSubject();
 
@@ -55,7 +55,10 @@ public class UserService {
         new ResponsiveStatusExeption("Usuário não encontrado")
       );
 
-    user.setName(userDTO.getName());
+      String name = jwt.getClaimAsString("name");
+
+
+    user.setName(name);
 
     User updatedUser = userRepository.save(user);
 
@@ -86,12 +89,11 @@ public class UserService {
 
   private UserResponseDTO toResponseDTO(User user) {
     return UserResponseDTO
-      .builder().auth0Id(user.getAuth0Id())
+      .builder()
       .name(user.getName())
       .level(user.getLevel())
       .currentXp(user.getCurrentXp())
       .createdAt(user.getCreatedAt())
-      .updatedAt(user.getUpdatedAt())
       .build();
   }
 
