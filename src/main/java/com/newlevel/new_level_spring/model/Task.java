@@ -2,6 +2,8 @@ package com.newlevel.new_level_spring.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -9,6 +11,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import com.newlevel.new_level_spring.types.Category;
 import com.newlevel.new_level_spring.types.Difficulty;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -18,10 +21,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @NoArgsConstructor
 @Data
@@ -69,5 +75,21 @@ public class Task {
   @Enumerated(EnumType.STRING)
   @Column(name = "difficulty", nullable = false)
   private Difficulty difficulty;
+
+  @Builder.Default
+  @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  private List<Subtask> subtasks = new ArrayList<>();
+
+  public void addSubtask(Subtask subtask) {
+    subtasks.add(subtask);
+    subtask.setTask(this);
+  }
+
+  public void removeSubtask(Subtask subtask) {
+    subtasks.remove(subtask);
+    subtask.setTask(null);
+  }
 
 }
