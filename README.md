@@ -75,3 +75,17 @@ Resposta:
 ```
 
 https://dev-c5nck27zn1v43s53.us.auth0.com/authorize?response_type=token&client_id=jj7WfvjIQ2ZLd1ZuIJW9SGnkKmVRBuja&redirect_uri=http://localhost:4200/&audience=https://newlevelauth.com&scope=openid profile email
+
+# .env exemple
+
+```env
+# Database
+DB_USER=your_db_user
+DB_PASSWORD=your_db_password
+DB_NAME=new_level
+DB_PORT=5432
+
+# Auth0
+AUTH_ISSUER=https://your-tenant.us.auth0.com/
+AUTH0_AUDIENCE=https://your-api-identifier
+```

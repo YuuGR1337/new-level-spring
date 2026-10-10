@@ -26,6 +26,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 public class SecurityConfig {
 
+  @Value("${app.cors.allowed-origin}")
+  private String allowedOrigin;
+
+  @Value("${auth0.audience}")
+  private String audience;
+
   @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
   private String issuerUri;
 
@@ -46,8 +52,8 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(List.of("http://localhost:4200")); // origem do Angular
-    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    configuration.setAllowedOrigins(List.of(allowedOrigin)); // origem do Angular
+    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
     configuration.setAllowedHeaders(List.of("*"));
     configuration.setAllowCredentials(true);
 
@@ -61,7 +67,7 @@ public class SecurityConfig {
     NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder) JwtDecoders.fromIssuerLocation(issuerUri);
 
     OAuth2TokenValidator<Jwt> audienceValidator = token ->
-      token.getAudience().contains("https://newlevelauth.com")
+      token.getAudience().contains(audience)
         ? OAuth2TokenValidatorResult.success()
         : OAuth2TokenValidatorResult.failure(new OAuth2Error("invalid_token", "Audience inválido", null));
 
